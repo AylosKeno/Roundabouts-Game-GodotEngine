@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b4p1yd8mu1gpx"
+path="res://.godot/imported/RoTa - Moved Pieces.mp3-d32c9adec669db514b210fdda7b90db9.mp3str"
+
+[deps]
+
+source_file="res://assets/sounds/RoTa - Moved Pieces.mp3"
+dest_files=["res://.godot/imported/RoTa - Moved Pieces.mp3-d32c9adec669db514b210fdda7b90db9.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

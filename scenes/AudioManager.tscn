@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://bfho8n6xb1klj"]
+
+[ext_resource type="AudioStream" uid="uid://bls6g7diwpbnh" path="res://assets/sounds/RoTa - Backsound.mp3" id="1_3dgps"]
+[ext_resource type="AudioStream" uid="uid://dmvp7hmbjgh4g" path="res://assets/sounds/RoTa - UI Hover.mp3" id="2_151wy"]
+[ext_resource type="AudioStream" uid="uid://b0806h0hmhq2d" path="res://assets/sounds/RoTa - UI Click.mp3" id="3_qb6qo"]
+[ext_resource type="AudioStream" uid="uid://csy0p0um1fola" path="res://assets/sounds/RoTa - UI.mp3" id="4_v5v75"]
+[ext_resource type="AudioStream" uid="uid://b4p1yd8mu1gpx" path="res://assets/sounds/RoTa - Moved Pieces.mp3" id="5_151wy"]
+[ext_resource type="AudioStream" uid="uid://b3b1mrjr41tgj" path="res://assets/sounds/RoTa - Eaten Pieces.mp3" id="6_qb6qo"]
+
+[node name="AudioManager" type="Node" unique_id=1194553492]
+
+[node name="BGM" type="AudioStreamPlayer" parent="." unique_id=2115220432]
+stream = ExtResource("1_3dgps")
+autoplay = true
+bus = &"Music"
+parameters/looping = true
+
+[node name="HoverSFX" type="AudioStreamPlayer" parent="." unique_id=466435170]
+stream = ExtResource("2_151wy")
+volume_db = 4.0
+bus = &"SFX"
+
+[node name="ClickSFX" type="AudioStreamPlayer" parent="." unique_id=116612539]
+stream = ExtResource("3_qb6qo")
+volume_db = 5.0
+bus = &"SFX"
+
+[node name="InvalidSFX" type="AudioStreamPlayer" parent="." unique_id=590313253]
+stream = ExtResource("4_v5v75")
+bus = &"SFX"
+
+[node name="PiecesMoveSFX" type="AudioStreamPlayer" parent="." unique_id=1851635949]
+stream = ExtResource("5_151wy")
+volume_db = 0.7
+pitch_scale = 1.5
+bus = &"SFX"
+
+[node name="PiecesEatenSFX" type="AudioStreamPlayer" parent="." unique_id=1315582908]
+stream = ExtResource("6_qb6qo")
+volume_db = 4.5
+pitch_scale = 1.5
+bus = &"SFX"

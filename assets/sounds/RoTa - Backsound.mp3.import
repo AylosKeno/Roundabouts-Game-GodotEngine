@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bls6g7diwpbnh"
+path="res://.godot/imported/RoTa - Backsound.mp3-7524fcba3ae9e46aa26f8f7ed2f24f99.mp3str"
+
+[deps]
+
+source_file="res://assets/sounds/RoTa - Backsound.mp3"
+dest_files=["res://.godot/imported/RoTa - Backsound.mp3-7524fcba3ae9e46aa26f8f7ed2f24f99.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dmvp7hmbjgh4g"
+path="res://.godot/imported/RoTa - UI Hover.mp3-60abe3daa30845b4137020fb51ae6daf.mp3str"
+
+[deps]
+
+source_file="res://assets/sounds/RoTa - UI Hover.mp3"
+dest_files=["res://.godot/imported/RoTa - UI Hover.mp3-60abe3daa30845b4137020fb51ae6daf.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

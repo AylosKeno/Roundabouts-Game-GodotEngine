@@ -1,0 +1,636 @@
+[gd_scene format=3 uid="uid://biyyejk3jgomd"]
+
+[ext_resource type="Script" uid="uid://bid74qssp2vv6" path="res://scripts/menu_controller.gd" id="1_ow34m"]
+[ext_resource type="Texture2D" uid="uid://dg476hfsisu6o" path="res://Wood Background.png" id="2_hubol"]
+[ext_resource type="LabelSettings" uid="uid://1oyxx8ys1m6d" path="res://font.res" id="3_826wr"]
+[ext_resource type="Script" uid="uid://ba7xwi3hckx6u" path="res://scripts/scroll_label.gd" id="4_ucygd"]
+[ext_resource type="Texture2D" uid="uid://bc8d4vo7dbesp" path="res://assets/image/Map 4x4.png" id="5_l72w3"]
+[ext_resource type="Texture2D" uid="uid://bytem6msm3cmr" path="res://assets/image/Map 4x4 - Click.png" id="6_ucygd"]
+[ext_resource type="Texture2D" uid="uid://7psilhmwp3yh" path="res://assets/image/Map 6x6.png" id="7_ucygd"]
+[ext_resource type="Texture2D" uid="uid://bwkectt4fk8c3" path="res://assets/image/Map 6x6 - Click.png" id="8_8a8k8"]
+[ext_resource type="Texture2D" uid="uid://dasmxn3xrbo07" path="res://assets/image/Map 6x6 - Hover.png" id="9_7la6k"]
+[ext_resource type="Texture2D" uid="uid://rqc8oexjpjut" path="res://assets/image/onlinepvp.png" id="10_ptake"]
+[ext_resource type="Texture2D" uid="uid://hytpqoccuryf" path="res://assets/image/onlinepvp - Click.png" id="11_hubol"]
+[ext_resource type="Texture2D" uid="uid://dv1avhfy0cs35" path="res://assets/image/onlinepvp - Hover.png" id="12_8vx4p"]
+[ext_resource type="Texture2D" uid="uid://crdv351vwq36l" path="res://assets/image/versus.png" id="13_tdapf"]
+[ext_resource type="Texture2D" uid="uid://lva757wcea6t" path="res://assets/image/versus - Click.png" id="14_v41fp"]
+[ext_resource type="Texture2D" uid="uid://djjh3l1bwu15c" path="res://assets/image/versus - Hover.png" id="15_7shrw"]
+[ext_resource type="Texture2D" uid="uid://dtrt623qxepbr" path="res://assets/image/RoTa - Logo.png" id="16_hubol"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_826wr"]
+load_path = "res://.godot/imported/Map 4x4 - Hover.png-00c800dc8ce2036b0f633fb7a94015b1.ctex"
+
+[sub_resource type="SystemFont" id="SystemFont_826wr"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ucygd"]
+font = SubResource("SystemFont_826wr")
+font_size = 22
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mipys"]
+bg_color = Color(0.06136909, 0.0613691, 0.06136909, 0.4862745)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1.8247963, 1.8247963, 1.8247963, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_8a8k8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_viowm"]
+bg_color = Color(0, 0, 0, 0.39607844)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1n6yq"]
+bg_color = Color(0, 0, 0, 0.39607844)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8a8k8"]
+bg_color = Color(0.23478182, 0.23478182, 0.23478182, 0.7411765)
+
+[node name="main" type="Node" unique_id=1052105349]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1383143871]
+
+[node name="MainMenu" type="Control" parent="CanvasLayer" unique_id=351511737]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(571, 324)
+size_flags_horizontal = 4
+script = ExtResource("1_ow34m")
+
+[node name="Bg" type="TextureRect" parent="CanvasLayer/MainMenu" unique_id=1498588151]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -21.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_hubol")
+expand_mode = 1
+
+[node name="Tutorial" type="Button" parent="CanvasLayer/MainMenu" unique_id=2013342752]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -73.0
+offset_bottom = 32.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.972549, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0.972549, 0.22352941, 0, 0.3529412)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 17
+text = "Tutorial"
+
+[node name="RoTa" type="TextureRect" parent="CanvasLayer/MainMenu" unique_id=1824534124]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 25.0
+offset_right = 100.0
+offset_bottom = 225.0
+grow_horizontal = 2
+texture = ExtResource("16_hubol")
+expand_mode = 1
+
+[node name="MainContainer" type="VBoxContainer" parent="CanvasLayer/MainMenu" unique_id=1957552981]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -157.0
+offset_top = -82.0
+offset_right = 143.0
+offset_bottom = 68.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(120, 75)
+
+[node name="Start_button" type="Button" parent="CanvasLayer/MainMenu/MainContainer" unique_id=1603102270]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Start"
+
+[node name="Option_button" type="Button" parent="CanvasLayer/MainMenu/MainContainer" unique_id=1870396351]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Option"
+
+[node name="Exit_button" type="Button" parent="CanvasLayer/MainMenu/MainContainer" unique_id=1028482518]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Exit"
+
+[node name="OptionContainer" type="VBoxContainer" parent="CanvasLayer/MainMenu" unique_id=345330953]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TabContainer" type="TabContainer" parent="CanvasLayer/MainMenu/OptionContainer" unique_id=13020925]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+tab_alignment = 1
+current_tab = 0
+
+[node name="Video" type="TabBar" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer" unique_id=1757007334]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="General_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=144946736]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 2.0
+offset_right = 95.0
+offset_bottom = 31.0
+text = "General"
+label_settings = ExtResource("3_826wr")
+
+[node name="Resolution_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=861777165]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 42.0
+offset_right = 173.0
+offset_bottom = 68.0
+text = "Resolution :"
+
+[node name="Resolution_Optionbutton" type="OptionButton" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=410406746]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 26.0
+offset_top = 72.5
+offset_right = 210.0
+offset_bottom = 103.5
+item_count = 10
+popup/item_0/text = "640x480"
+popup/item_0/id = 0
+popup/item_1/text = "800x600"
+popup/item_1/id = 1
+popup/item_2/text = "1024x768"
+popup/item_2/id = 2
+popup/item_3/text = "1280x720"
+popup/item_3/id = 3
+popup/item_4/text = "1366x768"
+popup/item_4/id = 4
+popup/item_5/text = "1600x900"
+popup/item_5/id = 5
+popup/item_6/text = "1920x1080"
+popup/item_6/id = 6
+popup/item_7/text = "2560x1440"
+popup/item_7/id = 7
+popup/item_8/text = "3840x2160"
+popup/item_8/id = 8
+popup/item_9/text = "7680x4320"
+popup/item_9/id = 9
+
+[node name="WindowMode_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=309149465]
+layout_mode = 0
+offset_left = 314.0
+offset_top = 42.0
+offset_right = 434.0
+offset_bottom = 68.0
+text = "Window Mode :"
+
+[node name="WindowMode_Optionbutton" type="OptionButton" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=1604187984]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 298.0
+offset_top = 73.0
+offset_right = 474.0
+offset_bottom = 105.0
+item_count = 2
+popup/item_0/text = "Fullscreen"
+popup/item_0/id = 0
+popup/item_1/text = "Windowed"
+popup/item_1/id = 1
+
+[node name="Vsync_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=1136445801]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 132.0
+offset_right = 145.0
+offset_bottom = 158.0
+text = "Vsync"
+
+[node name="Vsync_OptionButton" type="OptionButton" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=860053654]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 169.0
+offset_right = 210.0
+offset_bottom = 201.0
+item_count = 4
+popup/item_0/text = "off"
+popup/item_0/id = 0
+popup/item_1/text = "Normal"
+popup/item_1/id = 1
+popup/item_2/text = "Adaptative"
+popup/item_2/id = 2
+popup/item_3/text = "MailBox"
+popup/item_3/id = 3
+
+[node name="Graphics_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=1153775997]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 256.0
+offset_right = 103.0
+offset_bottom = 285.0
+text = "Graphics"
+label_settings = ExtResource("3_826wr")
+
+[node name="Preset_HSlider" type="HSlider" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" unique_id=337524114]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 342.0
+offset_right = 378.0
+offset_bottom = 358.0
+max_value = 20.0
+step = 5.0
+value = 5.0
+
+[node name="Preset_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/Preset_HSlider" unique_id=1641523726]
+layout_mode = 0
+offset_top = -24.0
+offset_right = 352.0
+offset_bottom = -1.0
+text = " Low  	   medium          high 	    very high      ultra"
+
+[node name="Sound" type="TabBar" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer" unique_id=779014712]
+visible = false
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="General_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound" unique_id=487199563]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 46.0
+offset_right = 48.0
+offset_bottom = 69.0
+text = "General volume :"
+
+[node name="General_HScrollBar" type="HScrollBar" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound" unique_id=544810706]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 78.0
+offset_right = 442.0
+offset_bottom = 94.0
+value = 70.0
+rounded = true
+
+[node name="Scroll_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/General_HScrollBar" unique_id=1903053469]
+layout_mode = 0
+offset_left = 440.0
+offset_top = -4.5
+offset_right = 473.0
+offset_bottom = 21.5
+text = "70%"
+script = ExtResource("4_ucygd")
+
+[node name="Music_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound" unique_id=1165512398]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 99.0
+offset_right = 142.0
+offset_bottom = 125.0
+text = "Music volume :"
+
+[node name="Music_HScrollBar" type="HScrollBar" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound" unique_id=1936628598]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 124.0
+offset_right = 440.0
+offset_bottom = 140.0
+value = 67.0
+rounded = true
+
+[node name="Scroll_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/Music_HScrollBar" unique_id=2097019309]
+layout_mode = 0
+offset_left = 440.0
+offset_top = -4.5
+offset_right = 473.0
+offset_bottom = 21.5
+text = "67%"
+script = ExtResource("4_ucygd")
+
+[node name="SFX_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound" unique_id=1635865751]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 146.0
+offset_right = 142.0
+offset_bottom = 172.0
+text = "SFX volume :"
+
+[node name="SFX_HScrollBar" type="HScrollBar" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound" unique_id=358441051]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 171.0
+offset_right = 440.0
+offset_bottom = 187.0
+value = 67.0
+rounded = true
+
+[node name="Scroll_Label" type="Label" parent="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/SFX_HScrollBar" unique_id=1533444543]
+layout_mode = 0
+offset_left = 440.0
+offset_top = -4.5
+offset_right = 473.0
+offset_bottom = 21.5
+text = "67%"
+script = ExtResource("4_ucygd")
+
+[node name="Container" type="HBoxContainer" parent="CanvasLayer/MainMenu/OptionContainer" unique_id=626791724]
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+
+[node name="Apply_button" type="Button" parent="CanvasLayer/MainMenu/OptionContainer/Container" unique_id=1949423715]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "Apply
+"
+
+[node name="Return_button" type="Button" parent="CanvasLayer/MainMenu/OptionContainer/Container" unique_id=861650457]
+layout_mode = 2
+text = "Return
+"
+
+[node name="StartContainer" type="VBoxContainer" parent="CanvasLayer/MainMenu" unique_id=1756899790]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 338.0
+offset_top = 56.5
+offset_right = 838.0
+offset_bottom = 591.5
+
+[node name="TabContainer" type="TabContainer" parent="CanvasLayer/MainMenu/StartContainer" unique_id=598577881]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+tab_alignment = 1
+current_tab = 0
+
+[node name="Singleplayer" type="TabBar" parent="CanvasLayer/MainMenu/StartContainer/TabContainer" unique_id=331089358]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="FS_TextureButton" type="TextureButton" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer" unique_id=1740005885]
+layout_mode = 0
+offset_left = 92.0
+offset_top = 79.5
+offset_right = 232.0
+offset_bottom = 219.5
+texture_normal = ExtResource("5_l72w3")
+texture_pressed = ExtResource("6_ucygd")
+texture_hover = SubResource("CompressedTexture2D_826wr")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="FS_Label" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/FS_TextureButton" unique_id=774809136]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 27.0
+offset_top = 140.0
+offset_right = 97.0
+offset_bottom = 168.0
+theme_override_constants/outline_size = 0
+theme_override_font_sizes/font_size = 20
+text = "4x4 Map"
+
+[node name="SS_TextureButton" type="TextureButton" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer" unique_id=1456799294]
+layout_mode = 0
+offset_left = 276.0
+offset_top = 79.5
+offset_right = 416.0
+offset_bottom = 219.5
+texture_normal = ExtResource("7_ucygd")
+texture_pressed = ExtResource("8_8a8k8")
+texture_hover = ExtResource("9_7la6k")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="SS_Label" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/SS_TextureButton" unique_id=1532653951]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 27.0
+offset_top = 140.0
+offset_right = 96.0
+offset_bottom = 168.0
+theme_override_font_sizes/font_size = 20
+text = "6x6 Map"
+
+[node name="AIMode_Label" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer" unique_id=76084177]
+layout_mode = 0
+offset_left = 191.0
+offset_top = 275.5
+offset_right = 278.0
+offset_bottom = 306.5
+text = "AI Mode"
+label_settings = SubResource("LabelSettings_ucygd")
+
+[node name="AIDepth_Label" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/AIMode_Label" unique_id=785007147]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 100.0
+offset_top = 3.0
+offset_right = 140.0
+offset_bottom = 30.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_mipys")
+text = "2.0"
+label_settings = SubResource("LabelSettings_8a8k8")
+horizontal_alignment = 1
+
+[node name="Level_HSlider" type="HSlider" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer" unique_id=1307595803]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 54.0
+offset_top = 345.5
+offset_right = -25.0
+offset_bottom = -107.5
+grow_horizontal = 2
+grow_vertical = 2
+min_value = 2.0
+max_value = 6.0
+step = 2.0
+value = 2.0
+
+[node name="Level_Description" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/Level_HSlider" unique_id=738850337]
+layout_mode = 0
+offset_left = 344.0
+offset_top = 95.0
+offset_right = 437.0
+offset_bottom = 118.0
+theme_override_colors/font_color = Color(1, 1, 1, 0.45882353)
+text = "by HanzzJL"
+
+[node name="Level_Label" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/Level_HSlider" unique_id=171192056]
+layout_mode = 0
+offset_left = 4.0
+offset_top = -34.0
+offset_right = 414.0
+offset_bottom = -11.0
+text = "HAI                                        PAI                                        TAI"
+
+[node name="Game_button" type="Button" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer" unique_id=1673865038]
+layout_mode = 0
+offset_left = 115.0
+offset_top = 405.0
+offset_right = 205.0
+offset_bottom = 440.0
+text = "Start"
+
+[node name="Back_button" type="Button" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer" unique_id=527883615]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 405.0
+offset_right = 390.0
+offset_bottom = 440.0
+text = "Back"
+
+[node name="Multiplayer" type="TabBar" parent="CanvasLayer/MainMenu/StartContainer/TabContainer" unique_id=415529277]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="OnlineMatch_TextureButton" type="TextureButton" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer" unique_id=1995877165]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 130.0
+offset_right = 210.0
+offset_bottom = 260.0
+texture_normal = ExtResource("10_ptake")
+texture_pressed = ExtResource("11_hubol")
+texture_hover = ExtResource("12_8vx4p")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="OnlineMatch_Label" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer/OnlineMatch_TextureButton" unique_id=1523027965]
+layout_mode = 0
+offset_top = 135.0
+offset_right = 140.0
+offset_bottom = 163.0
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_viowm")
+text = " Online Match"
+
+[node name="BoardMatch_TextureButton" type="TextureButton" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer" unique_id=425435688]
+layout_mode = 0
+offset_left = 270.0
+offset_top = 130.0
+offset_right = 400.0
+offset_bottom = 260.0
+texture_normal = ExtResource("13_tdapf")
+texture_pressed = ExtResource("14_v41fp")
+texture_hover = ExtResource("15_7shrw")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="BoardMatch_Label" type="Label" parent="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer/BoardMatch_TextureButton" unique_id=2018411525]
+layout_mode = 0
+offset_top = 135.0
+offset_right = 140.0
+offset_bottom = 163.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_1n6yq")
+text = " Board Match"
+
+[node name="InformAlert" type="Label" parent="CanvasLayer/MainMenu" unique_id=81114426]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -49.0
+offset_right = 576.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.120000005, 0.120000005, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8862745)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_8a8k8")
+text = "The Features Under Progress"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/Tutorial" to="CanvasLayer/MainMenu" method="_on_tutorial_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/Tutorial" to="CanvasLayer/MainMenu" method="_on_tutorial_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/MainContainer/Start_button" to="CanvasLayer/MainMenu" method="_on_start_button_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/MainContainer/Start_button" to="CanvasLayer/MainMenu" method="_on_start_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/MainContainer/Option_button" to="CanvasLayer/MainMenu" method="_on_option_button_mouse_entered"]
+[connection signal="mouse_exited" from="CanvasLayer/MainMenu/MainContainer/Option_button" to="CanvasLayer/MainMenu" method="_on_option_button_mouse_exited"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/MainContainer/Option_button" to="CanvasLayer/MainMenu" method="_on_option_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/MainContainer/Exit_button" to="CanvasLayer/MainMenu" method="_on_exit_button_mouse_entered"]
+[connection signal="mouse_exited" from="CanvasLayer/MainMenu/MainContainer/Exit_button" to="CanvasLayer/MainMenu" method="_on_exit_button_mouse_exited"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/MainContainer/Exit_button" to="CanvasLayer/MainMenu" method="_on_exit_button_pressed"]
+[connection signal="tab_button_pressed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video" to="CanvasLayer/MainMenu" method="_on_video_tab_button_pressed"]
+[connection signal="item_selected" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/Resolution_Optionbutton" to="CanvasLayer/MainMenu" method="_on_resolution_optionbutton_item_selected"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/Resolution_Optionbutton" to="CanvasLayer/MainMenu" method="_on_resolution_optionbutton_mouse_entered"]
+[connection signal="item_selected" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/WindowMode_Optionbutton" to="CanvasLayer/MainMenu" method="_on_window_mode_optionbutton_item_selected"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/WindowMode_Optionbutton" to="CanvasLayer/MainMenu" method="_on_window_mode_optionbutton_mouse_entered"]
+[connection signal="item_selected" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/Vsync_OptionButton" to="CanvasLayer/MainMenu" method="_on_vsync_option_button_item_selected"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/Vsync_OptionButton" to="CanvasLayer/MainMenu" method="_on_vsync_option_button_mouse_entered"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Video/Preset_HSlider" to="CanvasLayer/MainMenu" method="_on_preset_h_slider_value_changed"]
+[connection signal="tab_button_pressed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound" to="CanvasLayer/MainMenu" method="_on_sound_tab_button_pressed"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/General_HScrollBar" to="CanvasLayer/MainMenu" method="_on_general_h_scroll_bar_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/General_HScrollBar" to="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/General_HScrollBar/Scroll_Label" method="_on_h_scroll_bar_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/Music_HScrollBar" to="CanvasLayer/MainMenu" method="_on_music_h_scroll_bar_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/Music_HScrollBar" to="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/Music_HScrollBar/Scroll_Label" method="_on_h_scroll_bar_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/SFX_HScrollBar" to="CanvasLayer/MainMenu" method="_on_sfx_h_scroll_bar_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/SFX_HScrollBar" to="CanvasLayer/MainMenu/OptionContainer/TabContainer/Sound/SFX_HScrollBar/Scroll_Label" method="_on_h_scroll_bar_value_changed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/OptionContainer/Container/Apply_button" to="CanvasLayer/MainMenu" method="_on_apply_button_mouse_entered"]
+[connection signal="mouse_exited" from="CanvasLayer/MainMenu/OptionContainer/Container/Apply_button" to="CanvasLayer/MainMenu" method="_on_apply_button_mouse_exited"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/OptionContainer/Container/Apply_button" to="CanvasLayer/MainMenu" method="_on_apply_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/OptionContainer/Container/Return_button" to="CanvasLayer/MainMenu" method="_on_return_button_mouse_entered"]
+[connection signal="mouse_exited" from="CanvasLayer/MainMenu/OptionContainer/Container/Return_button" to="CanvasLayer/MainMenu" method="_on_return_button_mouse_exited"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/OptionContainer/Container/Return_button" to="CanvasLayer/MainMenu" method="_on_return_button_pressed"]
+[connection signal="tab_button_pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer" to="CanvasLayer/MainMenu" method="_on_singleplayer_tab_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/FS_TextureButton" to="CanvasLayer/MainMenu" method="_on_fs_texture_button_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/FS_TextureButton" to="CanvasLayer/MainMenu" method="_on_fs_texture_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/SS_TextureButton" to="CanvasLayer/MainMenu" method="_on_ss_texture_button_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/SS_TextureButton" to="CanvasLayer/MainMenu" method="_on_ss_texture_button_pressed"]
+[connection signal="value_changed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/Level_HSlider" to="CanvasLayer/MainMenu" method="_on_level_h_slider_value_changed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/Game_button" to="CanvasLayer/MainMenu" method="_on_game_button_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/Game_button" to="CanvasLayer/MainMenu" method="_on_game_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/Back_button" to="CanvasLayer/MainMenu" method="_on_back_button_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Singleplayer/Back_button" to="CanvasLayer/MainMenu" method="_on_back_button_pressed"]
+[connection signal="tab_button_pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer" to="CanvasLayer/MainMenu" method="_on_multiplayer_tab_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer/OnlineMatch_TextureButton" to="CanvasLayer/MainMenu" method="_on_online_match_texture_button_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer/OnlineMatch_TextureButton" to="CanvasLayer/MainMenu" method="_on_online_match_texture_button_pressed"]
+[connection signal="mouse_entered" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer/BoardMatch_TextureButton" to="CanvasLayer/MainMenu" method="_on_board_match_texture_button_mouse_entered"]
+[connection signal="pressed" from="CanvasLayer/MainMenu/StartContainer/TabContainer/Multiplayer/BoardMatch_TextureButton" to="CanvasLayer/MainMenu" method="_on_board_match_texture_button_pressed"]

@@ -1,0 +1,352 @@
+extends Control
+# Config file
+# Move it into a singleton
+var settings_file = ConfigFile.new()
+#--
+var vsync: int = 0
+var window_mode: int = 1 # Default 1 = Fullscreen
+var msaa_preset: int = 0 # Default 0 = Off 
+# - x : General , y : Music , z : SFX
+var audio: Vector3 = Vector3(70.0, 70.0, 70.0)
+var display_resolution : Vector2i = DisplayServer.screen_get_size()
+var boldline: int = 10
+var foursquaremap: bool = true
+var aidepth: int = 2
+var progress: int = 1
+
+
+@onready var resolution_option_button = get_node("%Resolution_Optionbutton")
+@onready var option_container = get_node("%OptionContainer")
+@onready var main_container = get_node("%MainContainer")
+@onready var start_container = get_node("%StartContainer")
+@onready var fs_label = get_node("%FS_Label")
+@onready var ss_label = get_node("%SS_Label")
+@onready var aidepth_label = get_node("%AIDepth_Label")
+@onready var notif_label = get_node("%InformAlert")
+@onready var level_slider = get_node("%Level_HSlider")
+@onready var rota_logo = get_node("%RoTa")
+@onready var window_mode_option_button = get_node("%WindowMode_Optionbutton")
+
+func _get_resolution(index) -> Vector2i:
+	var resolution_arr = resolution_option_button.get_item_text(index).split("x")
+	return Vector2i(int(resolution_arr[0]), int(resolution_arr[1]))
+
+
+func _check_resolution(resolution: Vector2i):
+	for i in resolution_option_button.get_item_count():
+		if _get_resolution(i) == resolution:
+			return i
+
+
+func _first_time():
+	# Ambil data bawaan layar
+	display_resolution = DisplayServer.screen_get_size()
+	window_mode = 1 # Fullscreen
+	vsync = 1 # Vsync On
+	msaa_preset = 1 # MSAA 2x
+	
+	%WindowMode_Optionbutton.select(window_mode)
+	_apply_video_settings()
+	_save_settings() # Langsung dipindahkan tugas ke fungsi save (agar kodenya tidak diperulang)
+
+func _load_settings():
+	if settings_file.load("res://settings.cfg") != OK:
+		_first_time()
+	else:
+		# Muat Data Video
+		display_resolution = settings_file.get_value("VIDEO", "Resolution", DisplayServer.screen_get_size())
+		window_mode = settings_file.get_value("VIDEO", "Window_Mode", 1)
+		vsync = settings_file.get_value("VIDEO", "VSync", 1)
+		msaa_preset = settings_file.get_value("VIDEO", "Graphics", 1)
+		_apply_video_settings()
+		
+		# Muat Data Audio
+		audio.x = settings_file.get_value("audio", "General")
+		audio.y = settings_file.get_value("audio", "Music")
+		audio.z = settings_file.get_value("audio", "SFX")
+		%General_HScrollBar.value = audio.x 
+		%Music_HScrollBar.value = audio.y
+		%SFX_HScrollBar.value = audio.z
+		progress = settings_file.get_value("GAME_SESSION", "progress", 1)
+
+func _save_settings():
+	# Simpan Data Video
+	settings_file.set_value("VIDEO", "Resolution", display_resolution)
+	settings_file.set_value("VIDEO", "Window_Mode", window_mode)
+	settings_file.set_value("VIDEO", "VSync", vsync)
+	settings_file.set_value("VIDEO", "Graphics", msaa_preset)
+	
+	# Simpan Data Audio
+	settings_file.set_value("audio", "General", audio.x)
+	settings_file.set_value("audio", "Music", audio.y)
+	settings_file.set_value("audio", "SFX", audio.z)
+	
+	# Simpan Progress/Level
+	settings_file.set_value("GAME_SESSION", "progress", progress)
+	settings_file.save("res://settings.cfg")
+
+# --- Sistem Setup Awal ---
+func _ready():
+	_load_settings()
+	resolution_option_button.select(_check_resolution(display_resolution))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(audio.x / 100.0))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(audio.y / 100.0))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), linear_to_db(audio.z / 100.0))
+
+# --- Main Menu Button Setup ---
+func _on_start_button_pressed():
+	start_container.visible = true
+	option_container.visible = false
+	main_container.visible = false
+	rota_logo.visible= false
+	fs_label.add_theme_constant_override("outline_size", boldline)
+	ss_label.add_theme_constant_override("outline_size", 0)
+	AudioManager.get_node("ClickSFX").play()
+func _on_option_button_pressed():
+	start_container.visible = false
+	option_container.visible = true
+	main_container.visible = false
+	rota_logo.visible= false
+	AudioManager.get_node("ClickSFX").play()
+func _on_exit_button_pressed():
+	AudioManager.get_node("ClickSFX").play()
+	get_tree().quit()
+
+# -- Video TAB --
+func _on_resolution_optionbutton_item_selected(index):
+	AudioManager.get_node("ClickSFX").play()
+	display_resolution = _get_resolution(index)
+	_apply_video_settings()
+func _on_window_mode_optionbutton_item_selected(index):
+	AudioManager.get_node("ClickSFX").play()
+	window_mode = index
+	_apply_video_settings()
+func _on_vsync_option_button_item_selected(index):
+	AudioManager.get_node("ClickSFX").play()
+	vsync = index
+	_apply_video_settings()
+func _on_preset_h_slider_value_changed(value):
+	msaa_preset = int(value)
+	_apply_video_settings()
+
+# -- Audio TAB --
+func _on_general_h_scroll_bar_value_changed(value):
+	audio.x = value
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(value / 100.0))
+	AudioManager.get_node("ClickSFX").play()
+func _on_music_h_scroll_bar_value_changed(value):
+	audio.y = value
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(value / 100.0))
+	AudioManager.get_node("ClickSFX").play()
+func _on_sfx_h_scroll_bar_value_changed(value):
+	audio.z = value
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), linear_to_db(value / 100.0))
+	AudioManager.get_node("ClickSFX").play()
+# -- Save and Exit buttons
+func _on_return_button_pressed():
+	AudioManager.get_node("ClickSFX").play()
+	main_container.visible = true
+	option_container.visible = false
+	rota_logo.visible= true
+func _on_apply_button_pressed():
+	AudioManager.get_node("ClickSFX").play()
+	main_container.visible = true
+	option_container.visible = false
+	rota_logo.visible= true
+	_save_settings()
+	
+# --- Graphic Engine (Settings) ---
+func _apply_video_settings() -> void:
+	# 1. Apply Resolution
+	get_window().size = display_resolution
+	# 2. Apply Window Mode (0: Windowed, 1: Fullscreen)
+	if window_mode == 0:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	elif window_mode == 1:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	# 3. Apply VSync (0: Disabled, 1: Enabled, 2: Adaptive)
+	if vsync == 0:
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	elif vsync == 1:
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+	elif vsync == 2:
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ADAPTIVE)
+	# 4. Apply Graphics / MSAA 2D (Smoothness Garis Resolusi)
+	if msaa_preset == 0:
+		get_viewport().msaa_2d = Viewport.MSAA_DISABLED
+	elif msaa_preset == 1:
+		get_viewport().msaa_2d = Viewport.MSAA_2X
+	elif msaa_preset == 2:
+		get_viewport().msaa_2d = Viewport.MSAA_4X
+	elif msaa_preset == 3:
+		get_viewport().msaa_2d = Viewport.MSAA_8X
+
+# --- Combined-Button System ---
+func _on_back_button_pressed() -> void:
+	AudioManager.get_node("ClickSFX").play()
+	main_container.visible = true
+	start_container.visible = false
+	rota_logo.visible= true
+func _on_fs_texture_button_pressed() -> void:
+	AudioManager.get_node("ClickSFX").play()
+	fs_label.add_theme_constant_override("outline_size", boldline)
+	ss_label.add_theme_constant_override("outline_size", 0)
+	foursquaremap = true
+func _on_ss_texture_button_pressed() -> void:
+	AudioManager.get_node("ClickSFX").play()
+	ss_label.add_theme_constant_override("outline_size", boldline)
+	fs_label.add_theme_constant_override("outline_size", 0)
+	foursquaremap = false
+func _on_level_h_slider_value_changed(value: float) -> void:
+	aidepth_label.text = str(value)
+	aidepth = int(value)
+	AudioManager.get_node("ClickSFX").play()
+func _on_online_match_texture_button_pressed() -> void:
+	AudioManager.get_node("ClickSFX").play()
+	notif_label.text = "The Features Under Progress - DM:dentrodimiourgou@gmail.com"
+	AudioManager.get_node("InvalidSFX").play()
+	self.process_mode = PROCESS_MODE_DISABLED
+	notif_label.visible = true
+	await get_tree().create_timer(2.0, true, false, true).timeout
+	notif_label.visible = false
+	self.process_mode = PROCESS_MODE_INHERIT
+func _on_board_match_texture_button_pressed() -> void:
+	AudioManager.get_node("ClickSFX").play()
+	notif_label.text = "The Features Under Progress - DM:dentrodimiourgou@gmail.com"
+	AudioManager.get_node("InvalidSFX").play()
+	self.process_mode = PROCESS_MODE_DISABLED
+	notif_label.visible = true
+	await get_tree().create_timer(2.0, true, false, true).timeout
+	notif_label.visible = false
+	self.process_mode = PROCESS_MODE_INHERIT
+func _on_game_button_pressed() -> void:
+	# 1. GERBANG LEVEL 5 (Klimaks): Eksklusif Map 6S + Depth 6
+	if aidepth == 6:
+		if foursquaremap == true: 
+			# Tolak jika player mencoba pakai Depth 6 di Map 4S
+			notif_label.text = "Depth 6 Only For 6S Map!"
+			level_slider.value = 4
+			aidepth = 4
+			aidepth_label.text = "4.0"
+			AudioManager.get_node("InvalidSFX").play()
+			self.process_mode = PROCESS_MODE_DISABLED
+			notif_label.visible = true
+			await get_tree().create_timer(2.0, true, false, true).timeout
+			notif_label.visible = false
+			self.process_mode = PROCESS_MODE_INHERIT
+			return
+		elif progress < 5:
+			# Tolak jika progress belum level 5
+			level_slider.value = 4
+			aidepth = 4
+			aidepth_label.text = "4.0"
+			
+			notif_label.text = "Need Level 5"
+			AudioManager.get_node("InvalidSFX").play()
+			self.process_mode = PROCESS_MODE_DISABLED
+			notif_label.visible = true
+			await get_tree().create_timer(2.0, true, false, true).timeout
+			notif_label.visible = false
+			self.process_mode = PROCESS_MODE_INHERIT
+			return
+
+	# 2. Bukaan Map 6S (Level 3 & Level 4)
+	if foursquaremap == false:
+		if progress < 3:
+			fs_label.add_theme_constant_override("outline_size", boldline)
+			ss_label.add_theme_constant_override("outline_size", 0)
+			foursquaremap = true # Memaksa balik Map ke Map 4S
+			
+			notif_label.text = "Need Level 3 or Above"
+			AudioManager.get_node("InvalidSFX").play()
+			self.process_mode = PROCESS_MODE_DISABLED
+			notif_label.visible = true
+			await get_tree().create_timer(2.0, true, false, true).timeout
+			notif_label.visible = false
+			self.process_mode = PROCESS_MODE_INHERIT
+			return
+		elif aidepth >= 4 and progress < 4:
+			level_slider.value = 2
+			aidepth = 2
+			aidepth_label.text = "2.0"
+			
+			notif_label.text = "Need Level 4 or Above"
+			AudioManager.get_node("InvalidSFX").play()
+			self.process_mode = PROCESS_MODE_DISABLED
+			notif_label.visible = true
+			await get_tree().create_timer(2.0, true, false, true).timeout
+			notif_label.visible = false
+			self.process_mode = PROCESS_MODE_INHERIT
+			return
+
+	# 3. Bukaan Map 4S (Level 2)
+	if foursquaremap == true and aidepth >= 4 and progress < 2:
+		level_slider.value = 2
+		aidepth = 2
+		aidepth_label.text = "2.0"
+		
+		notif_label.text = "Need Level 2 or Above"
+		AudioManager.get_node("InvalidSFX").play()
+		self.process_mode = PROCESS_MODE_DISABLED
+		notif_label.visible = true
+		await get_tree().create_timer(2.0, true, false, true).timeout
+		notif_label.visible = false
+		self.process_mode = PROCESS_MODE_INHERIT
+		return
+
+	# 4. Simpan Data & Eksekusi Pindah Scene
+	# (Memastikan Hitam/SS jalan duluan di 6S dan Putih/FS di 4S)
+	var strike_mode: String = "FS" if foursquaremap else "SS"
+	
+	settings_file.set_value("GAME_SESSION", "foursquaremap", foursquaremap)
+	settings_file.set_value("GAME_SESSION", "aidepth", aidepth)
+	settings_file.set_value("GAME_SESSION", "strike_mode", strike_mode)
+	settings_file.save("res://settings.cfg")
+	TransitionScreen.pindah_scene("res://scenes/MainGame.tscn")
+	
+# --- Tutorial Link ---
+func _on_tutorial_pressed() -> void:
+	OS.shell_open("https://www.youtube.com/watch?v=0yPl7OwOx7k") #<-- Saat Tombol di Klik, membuka video tutorial
+	AudioManager.get_node("ClickSFX").play()
+	
+func _on_singleplayer_tab_button_pressed(tab: int) -> void:
+	AudioManager.get_node("ClickSFX").play()
+func _on_multiplayer_tab_button_pressed(tab: int) -> void:
+	AudioManager.get_node("ClickSFX").play()
+func _on_video_tab_button_pressed(tab: int) -> void:
+	AudioManager.get_node("ClickSFX").play()
+func _on_sound_tab_button_pressed(tab: int) -> void:
+	AudioManager.get_node("ClickSFX").play()
+
+# --- Hover SFX Connetion ----
+# Menambah SFX Hover ke setiap tombol
+func _on_start_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_option_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_exit_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_resolution_optionbutton_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_window_mode_optionbutton_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_vsync_option_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_apply_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_return_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_game_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_back_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_fs_texture_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_ss_texture_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_online_match_texture_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_board_match_texture_button_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()
+func _on_tutorial_mouse_entered() -> void:
+	AudioManager.get_node("HoverSFX").play()

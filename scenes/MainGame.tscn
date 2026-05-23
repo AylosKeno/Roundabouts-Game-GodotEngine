@@ -1,0 +1,147 @@
+[gd_scene format=3 uid="uid://cdglvly8dlgox"]
+
+[ext_resource type="Script" uid="uid://be71coksktcc8" path="res://scripts/game_controller.gd" id="1_hat22"]
+[ext_resource type="Texture2D" uid="uid://dg8t24tkc5ho1" path="res://assets/image/RoTa - Home Button.png" id="2_fpdtd"]
+[ext_resource type="Texture2D" uid="uid://bd7mu6ya6hlfb" path="res://assets/image/RoTa - Home Button Pressed.png" id="3_1hpqh"]
+[ext_resource type="Texture2D" uid="uid://bv24p8nx2ifun" path="res://assets/image/RoTa - Home Button Hover.png" id="4_7f7ne"]
+[ext_resource type="Texture2D" uid="uid://btdj1mtmytfw2" path="res://assets/image/RoTa - Repeat Button.png" id="5_rtryj"]
+[ext_resource type="Texture2D" uid="uid://700ep74seiuh" path="res://assets/image/RoTa - Repeat Button Pressed.png" id="6_vs82q"]
+[ext_resource type="Texture2D" uid="uid://b318mdpojyu1i" path="res://assets/image/RoTa - Repeat Button Hover.png" id="7_qsiih"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fpdtd"]
+bg_color = Color(0.23478182, 0.23478182, 0.23478182, 0.7411765)
+
+[node name="MainGame" type="Node2D" unique_id=318081383]
+script = ExtResource("1_hat22")
+offset_4s = Vector2(-191, -197)
+cell_size_4s = 126.5
+offset_6s = Vector2(-191, -197)
+cell_size_6s = 77.5
+
+[node name="BoardMap" type="Node2D" parent="." unique_id=170451923]
+
+[node name="MapSprite" type="Sprite2D" parent="BoardMap" unique_id=201287868]
+
+[node name="PiecesContainer" type="Node2D" parent="." unique_id=220781123]
+
+[node name="MainCamera" type="Camera2D" parent="." unique_id=1424714034]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=771439429]
+
+[node name="GameOverScreen" type="ColorRect" parent="CanvasLayer" unique_id=1029077886]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="GameOver_Panel" type="Panel" parent="CanvasLayer/GameOverScreen" unique_id=1056017167]
+custom_minimum_size = Vector2(600, 300)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/GameOverScreen/GameOver_Panel" unique_id=1031292683]
+custom_minimum_size = Vector2(600, 300)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="GameOverTitle" type="Label" parent="CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer" unique_id=466811802]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.44705883, 0, 0.48235294, 0.67058825)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 0.8235294)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 40
+text = "Game Over"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer/GameOverTitle" unique_id=1973829200]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -65.0
+offset_top = 122.5
+offset_right = 65.0
+offset_bottom = 172.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="Home_TextureButton" type="TextureButton" parent="CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer/GameOverTitle/HBoxContainer" unique_id=661878378]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("2_fpdtd")
+texture_pressed = ExtResource("3_1hpqh")
+texture_hover = ExtResource("4_7f7ne")
+
+[node name="Repeat_TextureButton" type="TextureButton" parent="CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer/GameOverTitle/HBoxContainer" unique_id=422449984]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("5_rtryj")
+texture_pressed = ExtResource("6_vs82q")
+texture_hover = ExtResource("7_qsiih")
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer" unique_id=565180773]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Game Over"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Home2_TextureButton" type="TextureButton" parent="CanvasLayer" unique_id=1850808388]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 30.0
+offset_top = -20.0
+offset_right = 70.0
+offset_bottom = 20.0
+grow_vertical = 2
+texture_normal = ExtResource("2_fpdtd")
+texture_pressed = ExtResource("3_1hpqh")
+texture_hover = ExtResource("4_7f7ne")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="AIStatus" type="Label" parent="." unique_id=392204263]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -50.0
+offset_right = 576.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.92941177, 0.12156863, 1)
+theme_override_colors/font_outline_color = Color(1, 0.58431375, 0.12156863, 0.7490196)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_fpdtd")
+text = "AI in Thingking Mode"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
