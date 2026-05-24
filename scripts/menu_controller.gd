@@ -39,15 +39,17 @@ func _check_resolution(resolution: Vector2i):
 
 
 func _first_time():
-	# # Home2 button click function (In Live Game)
 	display_resolution = DisplayServer.screen_get_size()
-	window_mode = 1 # Fullscreen
-	vsync = 1 # Vsync On
-	msaa_preset = 1 # MSAA 2x
-	
+	# Web Detection
+	if OS.has_feature("web"):
+		window_mode = 0 # Biarkan mode Windowed menyesuaikan kanvas Itch.io
+	else:
+		window_mode = 1 # Fullscreen aman untuk file .exe PC
+	vsync = 1 
+	msaa_preset = 1 
 	%WindowMode_Optionbutton.select(window_mode)
 	_apply_video_settings()
-	_save_settings() # Move the task directly to the save function (so that the code is not repeated)
+	_save_settings()
 
 func _load_settings():
 	if settings_file.load("res://settings.cfg") != OK:
