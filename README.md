@@ -1,5 +1,5 @@
-# RoTa - Tactical Board Game (Godot 4.x)
-A 2D turn-based tactical board game developed in Godot 4.x. The project utilizes a dynamic grid architecture and an asynchronous AI engine. This repository is open-source and open for modification.
+# RoTa - Tactical Board Game (Godot 4.6.2)
+A 2D turn-based tactical board game developed in Godot 4.6.2 The project utilizes a dynamic grid architecture and an asynchronous AI engine. This repository is open-source and open for modification.
 <img src="thumbnail.png" width="100%"/>
 -[**Gameplay Link**](https://hanzzjl.itch.io/roundabouts).
 <br>
