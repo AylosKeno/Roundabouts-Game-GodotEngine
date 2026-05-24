@@ -39,7 +39,7 @@ func _check_resolution(resolution: Vector2i):
 
 
 func _first_time():
-	# Ambil data bawaan layar
+	# # Home2 button click function (In Live Game)
 	display_resolution = DisplayServer.screen_get_size()
 	window_mode = 1 # Fullscreen
 	vsync = 1 # Vsync On
@@ -47,20 +47,17 @@ func _first_time():
 	
 	%WindowMode_Optionbutton.select(window_mode)
 	_apply_video_settings()
-	_save_settings() # Langsung dipindahkan tugas ke fungsi save (agar kodenya tidak diperulang)
+	_save_settings() # Move the task directly to the save function (so that the code is not repeated)
 
 func _load_settings():
 	if settings_file.load("res://settings.cfg") != OK:
 		_first_time()
 	else:
-		# Muat Data Video
+		# Load Video Data
 		display_resolution = settings_file.get_value("VIDEO", "Resolution", DisplayServer.screen_get_size())
 		window_mode = settings_file.get_value("VIDEO", "Window_Mode", 1)
 		vsync = settings_file.get_value("VIDEO", "VSync", 1)
 		msaa_preset = settings_file.get_value("VIDEO", "Graphics", 1)
-		_apply_video_settings()
-		
-		# Muat Data Audio
 		audio.x = settings_file.get_value("audio", "General")
 		audio.y = settings_file.get_value("audio", "Music")
 		audio.z = settings_file.get_value("audio", "SFX")
@@ -70,22 +67,22 @@ func _load_settings():
 		progress = settings_file.get_value("GAME_SESSION", "progress", 1)
 
 func _save_settings():
-	# Simpan Data Video
+	# Save Video Data
 	settings_file.set_value("VIDEO", "Resolution", display_resolution)
 	settings_file.set_value("VIDEO", "Window_Mode", window_mode)
 	settings_file.set_value("VIDEO", "VSync", vsync)
 	settings_file.set_value("VIDEO", "Graphics", msaa_preset)
 	
-	# Simpan Data Audio
+	# Save Audio Data
 	settings_file.set_value("audio", "General", audio.x)
 	settings_file.set_value("audio", "Music", audio.y)
 	settings_file.set_value("audio", "SFX", audio.z)
 	
-	# Simpan Progress/Level
+	# Save Progress/Level
 	settings_file.set_value("GAME_SESSION", "progress", progress)
 	settings_file.save("res://settings.cfg")
 
-# --- Sistem Setup Awal ---
+# --- Initial Setup System ---
 func _ready():
 	_load_settings()
 	resolution_option_button.select(_check_resolution(display_resolution))
@@ -212,13 +209,12 @@ func _on_online_match_texture_button_pressed() -> void:
 	self.process_mode = PROCESS_MODE_INHERIT
 func _on_board_match_texture_button_pressed() -> void:
 	AudioManager.get_node("ClickSFX").play()
-	notif_label.text = "The Features Under Progress - DM:dentrodimiourgou@gmail.com"
-	AudioManager.get_node("InvalidSFX").play()
-	self.process_mode = PROCESS_MODE_DISABLED
-	notif_label.visible = true
-	await get_tree().create_timer(2.0, true, false, true).timeout
-	notif_label.visible = false
-	self.process_mode = PROCESS_MODE_INHERIT
+	settings_file.set_value("GAME_SESSION", "game_mode", "pvp")
+	settings_file.set_value("GAME_SESSION", "foursquaremap", false) # Map Set to 6S
+	settings_file.set_value("GAME_SESSION", "strike_mode", "FS")    # Player 1 have the first move/turn
+	settings_file.save("res://settings.cfg")
+	print("[SYSTEM] Mode Board Match diaktifkan (Map 6S). Memuat arena...")
+	TransitionScreen.pindah_scene("res://scenes/MainGame.tscn")
 func _on_game_button_pressed() -> void:
 	# 1. GERBANG LEVEL 5 (Klimaks): Eksklusif Map 6S + Depth 6
 	if aidepth == 6:
@@ -301,6 +297,7 @@ func _on_game_button_pressed() -> void:
 	settings_file.set_value("GAME_SESSION", "foursquaremap", foursquaremap)
 	settings_file.set_value("GAME_SESSION", "aidepth", aidepth)
 	settings_file.set_value("GAME_SESSION", "strike_mode", strike_mode)
+	settings_file.set_value("GAME_SESSION", "game_mode", "pve")
 	settings_file.save("res://settings.cfg")
 	TransitionScreen.pindah_scene("res://scenes/MainGame.tscn")
 	

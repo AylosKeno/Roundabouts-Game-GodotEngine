@@ -31,3 +31,4 @@ TransitionScreen="*uid://wr1is6vpubue"
 [display]
 
 window/size/resizable=false
+window/stretch/mode="canvas_items"

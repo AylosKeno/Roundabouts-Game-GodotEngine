@@ -8,8 +8,8 @@ var cell_size: float = 90.0
 var board_offset: Vector2 = Vector2(0, 0) 
 
 
-@export_group("4S Map Tuning") # Fitur "Tuning": Mengatur langsung posisi barisan pion dari Inspector Panel bagian kanan
-@export var offset_4s: Vector2 = Vector2(-200, -200) # Titik awal pion pertama (0,0)
+@export_group("4S Map Tuning") # "Tuning" Feature: Directly adjust the position of the pawn lineup from the right-side Inspector Panel
+@export var offset_4s: Vector2 = Vector2(-200, -200) # Starting point of the first pawn (0,0)
 @export var cell_size_4s: float = 133.0
 @export_group("6S Map Tuning")
 @export var offset_6s: Vector2 = Vector2(-260, -260)
@@ -19,13 +19,14 @@ var board_offset: Vector2 = Vector2(0, 0)
 var board_matrix: Array = []
 var active_ai_depth: int = 2
 var current_turn: String = "FS"
-# --- HDC AI VARIABLES ---
+var game_mode: String = "pve"
+# --- HDC AI Variables ---
 var hdc_thread: Thread
 var is_ai_thinking: bool = false
-# --- INPUT & SELECTION DATA ---	
+# --- Input & Selection Data ---	
 var selected_pos: Vector2 = Vector2(-1, -1)
 var selection_marker: ColorRect
-var valid_move_markers: Array = [] # Pembuatan Baris Baru: Menyimpan jejak kotak hijau/merah
+var valid_move_markers: Array = [] # <-- Creating New Rows: Keeping track of green/red boxes
 
 # --- NODE REFERENCES ---
 @onready var board_map = $BoardMap
@@ -34,9 +35,10 @@ var valid_move_markers: Array = [] # Pembuatan Baris Baru: Menyimpan jejak kotak
 # --- UI REFERENCES ---
 @onready var game_over_screen = $CanvasLayer/GameOverScreen
 @onready var status_label = $CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer/StatusLabel
+@onready var level_description = %Level_Description
 @onready var home_btn = $CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer/GameOverTitle/HBoxContainer/Home_TextureButton
 @onready var repeat_btn = $CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer/GameOverTitle/HBoxContainer/Repeat_TextureButton
-@onready var home2_btn = $CanvasLayer/Home2_TextureButton
+@onready var giveup_btn = $CanvasLayer/GiveUp_TextureButton
 @onready var ai_status_label = $AIStatus
 # --- ASSETS PRELOAD ---
 var map_4s = preload("res://assets/image/RoTa - 4S Map.png")
@@ -54,14 +56,17 @@ func _ready() -> void:
 	_initialize_uma_structure()
 	_spawn_universal_pieces()
 	_create_selection_marker()
-	ai_status_label.visible = false 
+	ai_status_label.visible = false
+	level_description.visible = false
 	
 	home_btn.pressed.connect(_on_home_pressed)
-	home2_btn.pressed.connect(_on_home2_pressed)
+	giveup_btn.pressed.connect(_on_give_up_pressed)
 	repeat_btn.pressed.connect(_on_repeat_pressed)
 	
-	# Anti-Deadlock: Activate AI jika Hitam jalan dulu
+	# Anti-Deadlock: Activate AI if Black goes first
 	if current_turn == "SS":
+		_wake_up_hdc()
+	if current_turn == "SS" and game_mode == "pve":
 		_wake_up_hdc()
 	
 func _exit_tree() -> void:
@@ -69,16 +74,24 @@ func _exit_tree() -> void:
 		hdc_thread.wait_to_finish()
 
 		  # --- UMA Module 1 --- 
-# Sync data & Ambil Parameter Visual dinamis
+# Sync data & Get dynamic Visual Parameters
 func _load_session_data() -> void:
 	var config = ConfigFile.new()
 	if config.load("res://settings.cfg") == OK:
-		var is_4x4 = config.get_value("GAME_SESSION", "foursquaremap", true)
-		N = 4 if is_4x4 else 6
+		# Get game mode data
+		game_mode = config.get_value("GAME_SESSION", "game_mode", "pve")
 		active_ai_depth = config.get_value("GAME_SESSION", "aidepth", 2)
-		current_turn = config.get_value("GAME_SESSION", "strike_mode", "FS")
-	
-# Menentukan texture dan Grid Parameter berdasarkan nilai Map (N)
+		
+		# Branch map dimension reading based on session mode
+		if game_mode == "pvp":
+			N = 6 # Force 6x6 dimension for Board Match
+			current_turn = "FS" # PvP must start from the white faction
+		else:
+			var is_4x4 = config.get_value("GAME_SESSION", "foursquaremap", true)
+			N = 4 if is_4x4 else 6
+			current_turn = config.get_value("GAME_SESSION", "strike_mode", "FS")
+
+	# Determining the Texture and Grid Parameter based on the Map (N) value
 	if N == 4:
 		map_sprite.texture = map_4s
 		board_offset = offset_4s
@@ -87,7 +100,7 @@ func _load_session_data() -> void:
 		map_sprite.texture = map_6s
 		board_offset = offset_6s
 		cell_size = cell_size_6s
-
+		
 # --- UMA Module 2 ---
 # Memory Matrix
 func _initialize_uma_structure() -> void:
@@ -99,16 +112,16 @@ func _initialize_uma_structure() -> void:
 		board_matrix[x].resize(N)
 		for y in range(N):
 			if y >= N - piece_rows:
-				board_matrix[x][y] = 1 # Player 1 (Pion Putih)
+				board_matrix[x][y] = 1 #Player 1 (White Pawn)
 			elif y < piece_rows:
-				board_matrix[x][y] = 2 # AI (Pion Hitam)
+				board_matrix[x][y] = 2 # AI (Black Pawn)
 			else:
 				board_matrix[x][y] = 0 
 
 	 # --- UMA Module 2 Visual ---
-#Spawn Pion Relatif terhadap Pusat Map
+# Pawn Spawn Relative to Map Center
 func _spawn_universal_pieces() -> void:
-	# Delete Pion lama jika ada, untuk mencegah stacking saat proses Tuning
+	# Delete old Pawns if any, to prevent stacking during the Tuning process.
 	for child in pieces_container.get_children():
 		child.queue_free()
 		
@@ -121,7 +134,7 @@ func _spawn_universal_pieces() -> void:
 			var piece_visual = Sprite2D.new()
 			piece_visual.texture = piece_white if piece_type == 1 else piece_black
 			
-			# Kalkulasi posisi koordinat (pixel) yang mengacu pada pusat BoardMap
+			# Calculation of coordinate positions (pixels) referring to the center of the BoardMap
 			var pixel_position = board_map.position + board_offset + Vector2(x * cell_size, y * cell_size)
 			piece_visual.position = pixel_position
 			
@@ -129,33 +142,31 @@ func _spawn_universal_pieces() -> void:
 			
 func _create_selection_marker() -> void:
 	selection_marker = ColorRect.new()
-	selection_marker.size = Vector2(60, 60) # Sesuaikan dengan ukuran Pionmu (60x60)
+	selection_marker.size = Vector2(60, 60) # Adjust to your Pawn size (60x60)
 	selection_marker.color = Color(0, 1, 0, 0.4) 
 	selection_marker.pivot_offset = selection_marker.size / 2
 	selection_marker.visible = false 
 	board_map.add_child(selection_marker)
 	
-# --- UMA TURN MANAGER & REFEREE SYSTEM ---
+# --- UMA Turn Manager & Referee System ---
 func _switch_turn() -> void:
 	_reset_selection()
-	
-	if _check_game_over():
-		return 
+	if _check_game_over(): return 
 	
 	if current_turn == "FS":
 		current_turn = "SS"
-		
-		# Pemanggilan AI. Player tidak bisa mengklik apapun sampai AI selesai berpikir
-		_wake_up_hdc()
+		# AI is only triggered when fighting against the computer
+		if game_mode == "pve":
+			_wake_up_hdc()
 	else:
 		current_turn = "FS"
 
-# Penentu Game Over
+# Game Over Determinant
 func _check_game_over() -> bool:
 	var sisa_putih = 0
 	var sisa_hitam = 0
 	
-	# Scan seluruh papan untuk menghitung jumlah/populasi pion
+	# Scan the entire board to count the number/population of pawns.
 	for x in range(N):
 		for y in range(N):
 			if board_matrix[x][y] == 1:
@@ -163,20 +174,20 @@ func _check_game_over() -> bool:
 			elif board_matrix[x][y] == 2:
 				sisa_hitam += 1
 				
-	# Evaluasi Win Condition
+	# Evaluate Win Condition
 	if sisa_putih == 0:
 		current_turn = "GAME_OVER"
-		_show_game_over_screen(false) # Player Kalah
+		_show_game_over_screen(false) # Player Lose
 		return true
 	elif sisa_hitam == 0:
 		current_turn = "GAME_OVER"
-		_show_game_over_screen(true) # Player Menang
+		_show_game_over_screen(true) # Player Win
 		return true
 		
-	return false # Game berlanjut karena dua pihak masih hidup
+	return false # The game continues as two parties are still alive.
 
 # =========================================================
-# UMA MODULE 3, 4, 5, 6: CORE MECHANICS & RTX ALGORITHM
+# UMA Module 3, 4, 5, 6: Core Mechanics & RTX Algorithm
 # =========================================================
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -189,17 +200,16 @@ func _input(event: InputEvent) -> void:
 
 func _handle_grid_click(x: int, y: int) -> void:
 	if current_turn == "GAME_OVER": return
-	
-	# HDC Lock: Can't Click jika AI sedang menghitung di dimensi lain
-	if current_turn == "SS" or is_ai_thinking:
+	# HDC Lock: Can't Click if AI is calculating in another dimensionus
+	if game_mode == "pve" and (current_turn == "SS" or is_ai_thinking):
 		return
 	var isi_kotak = board_matrix[x][y]
 	
-	# Identifikasi Kawan/Lawan secara dinamis berdasarkan current_turn
+	# Dynamically identify Friend/Foe based on current_turn
 	var kawan = 1 if current_turn == "FS" else 2
 	var lawan = 2 if current_turn == "FS" else 1
 	
-	# Kondisi 1: Seleksi Pion Sendiri (Hanya boleh klik faksi yang sedang aktif)
+	# Condition 1: Select Your Own Pawn (Only click on the active faction)
 	if isi_kotak == kawan:
 		_reset_selection()
 		selected_pos = Vector2(x, y)
@@ -207,12 +217,12 @@ func _handle_grid_click(x: int, y: int) -> void:
 		selection_marker.visible = true
 		_show_legal_moves(x, y)
 		
-	# Kondisi 2: Interaksi setelah Pion Dipilih
+	# 	Condition 2: Interaction after Pawn is Selected
 	elif selected_pos != Vector2(-1, -1):
 		var jarak_x = abs(x - selected_pos.x)
 		var jarak_y = abs(y - selected_pos.y)
 		
-		# --- Jalur A: Normal Move ---
+		# --- Path A: Normal Move ---
 		if isi_kotak == 0 and ((jarak_x == 1 and jarak_y == 0) or (jarak_x == 0 and jarak_y == 1)):
 			board_matrix[x][y] = kawan
 			board_matrix[selected_pos.x][selected_pos.y] = 0
@@ -221,7 +231,7 @@ func _handle_grid_click(x: int, y: int) -> void:
 			_spawn_universal_pieces()
 			_switch_turn() # <--- SAKELAR GILIRAN DIPICU DI SINI
 			
-		# --- Jalur B: RTX Activation (Makan Musuh ATAU Pindah) ---
+		# --- Path B: RTX Activation (Eat Enemy OR Move) ---
 		elif isi_kotak == lawan or isi_kotak == 0:
 			if _is_valid_rtx_start(selected_pos.x, selected_pos.y):
 				var dir = _get_outward_direction(selected_pos.x, selected_pos.y)
@@ -231,7 +241,7 @@ func _handle_grid_click(x: int, y: int) -> void:
 		else:
 			AudioManager.get_node("InvalidSFX").play()
 
-# Dapatkan visualisasi Trajectory ke luar papan memutar dan kembali
+# Get a visualization of the Trajectory out of the board turning and back
 func _get_outward_direction(sx: int, sy: int) -> Vector2:
 	if sx == 0: return Vector2(-1, 0)
 	if sx == N - 1: return Vector2(1, 0)
@@ -254,7 +264,7 @@ func _execute_rtx(start_x: int, start_y: int, dir_x: int, dir_y: int, target_x: 
 		current_x += dir_x
 		current_y += dir_y
 		
-		# Sensor Ujung, dan System LauZen/Kuadran
+		# Edge Sensor, and LauZen/Quadrant System
 		if current_x < 0 or current_x >= N or current_y < 0 or current_y >= N:
 			var in_x = current_x - dir_x
 			var in_y = current_y - dir_y
@@ -275,30 +285,28 @@ func _execute_rtx(start_x: int, start_y: int, dir_x: int, dir_y: int, target_x: 
 				dir_x = dir_y
 				dir_y = temp_dir
 			
-		# Pemberhentian Langkah dalam papan (Langsung dicek saat mendarat di TDP)
-		var isi_kotak_sekarang = board_matrix[current_x][current_y]
+		# Step Stop in the board (Immediately checked when landing on the TDP)
+		var current_board = board_matrix[current_x][current_y]
 		
-			# 1. Cek apakah ini adalah titik kotak yang diklik player?
+			# 1. Check if this is the box point the player clicked?
 		if current_x == target_x and current_y == target_y:
-			if isi_kotak_sekarang == 2 or isi_kotak_sekarang == 1: # Nabrak siapa pun di target
-				AudioManager.get_node("PiecesEatenSFX").play() # <--- SUNTIKAN SFX MAKAN DI SINI
-			else:
-				
-				board_matrix[current_x][current_y] = board_matrix[start_x][start_y] # Pindahkan identitas asli
-			board_matrix[start_x][start_y] = 0     # Kosongkan posisi awal
+			if current_board == 2 or current_board == 1: # Hit anyone on target
+				AudioManager.get_node("PiecesEatenSFX").play() # <--- Eat SFX
+			board_matrix[current_x][current_y] = board_matrix[start_x][start_y] 
+			board_matrix[start_x][start_y] = 0     # Clear the starting position
 			AudioManager.get_node("PiecesMoveSFX").play()
 			
 			_spawn_universal_pieces()
-			_switch_turn() # <--- Pemicu Giliran Ganti
+			_switch_turn() # <--- Turn-Change Trigger
 			return
 			
-		# 2. Jika bukan titik yang diklik, tapi menabrak sesuatu di tengah jalan
-		if isi_kotak_sekarang == 2:
+		# 2. If it's not a point that is clicked, but it hits something in the middle of the road
+		if current_board == 2:
 			AudioManager.get_node("InvalidSFX").play()
 			_reset_selection()
 			return
 			
-		elif isi_kotak_sekarang == 1:
+		elif current_board == 1:
 			AudioManager.get_node("InvalidSFX").play()
 			_reset_selection()
 			return
@@ -309,7 +317,7 @@ func _reset_selection() -> void:
 	selected_pos = Vector2(-1, -1)
 	selection_marker.visible = false
 	
-	# Bersihkan semua marker Trajectory dari layar
+	# Clear all Trajectory markers from the screen
 	for marker in valid_move_markers:
 		if is_instance_valid(marker):
 			marker.queue_free()
@@ -318,7 +326,7 @@ func _reset_selection() -> void:
 # =========================================================
 # UMA Visual Projection System (GHOST TRAIL)
 # =========================================================
-# Fungsi utama untuk menggambar marker kotak transparan (Fix Layer Order)
+# 	The main function is to draw transparent box markers (Fix Layer Order)
 func _draw_highlight(x: int, y: int, is_enemy: bool = false) -> void:
 	var marker = Sprite2D.new()
 	
@@ -327,46 +335,46 @@ func _draw_highlight(x: int, y: int, is_enemy: bool = false) -> void:
 	else:
 		marker.texture = path_green_tex
 		
-	# Sprite2D otomatis menggunakan titik pusat (center), untuk menyesuaikan posisi
+	# Sprite2D automatically uses the center point to adjust the position.
 	marker.position = board_offset + Vector2(x * cell_size, y * cell_size)
 	
-	# Memaksa marker naik 1 tingkat di atas Pion (default Pion = 0)
+	# Forces the marker to move up 1 level above the Pawn (default Pawn = 0)
 	marker.z_index = 1
 	
 	board_map.add_child(marker)
 	valid_move_markers.append(marker)
 
-# Fungsi untuk mencari Legal Move
+# Function to search for Legal Move
 func _show_legal_moves(sx: int, sy: int) -> void:
-	# 1. Proyeksi Normal Move (Cek 4 arah yang kosong)
+	# 1. Normal Move Projection (Check 4 empty directions)
 	var arah_normal = [Vector2(0, -1), Vector2(0, 1), Vector2(-1, 0), Vector2(1, 0)]
 	for arah in arah_normal:
 		var nx = sx + int(arah.x)
 		var ny = sy + int(arah.y)
 		if nx >= 0 and nx < N and ny >= 0 and ny < N:
 			if board_matrix[nx][ny] == 0:
-				_draw_highlight(nx, ny, false) # Gambar hijau di kotak kosong sebelah
+				_draw_highlight(nx, ny, false) # Green image in the next empty box
 				
-	# 2. Proyeksi RTX Path (Jika Pion ada di TDP)
+	# 2. RTX Path Projection (If Pawn is at TDP)
 	if _is_valid_rtx_start(sx, sy):
 		var dir = _get_outward_direction(sx, sy)
 		_project_rtx_path(sx, sy, dir.x, dir.y)
 
-# Simulasi Ghost Trail RTX
+# Ghost Trail RTX Simulation
 func _project_rtx_path(start_x: int, start_y: int, dir_x: int, dir_y: int) -> void:
 	var current_x = start_x
 	var current_y = start_y
 	
-	# Identifikasi Dinamis: Tentukan kawan/lawan asli sesuai giliran
+	# Dynamic Identification: Determine real friends/foes according to turn
 	var kawan = 1 if current_turn == "FS" else 2
 	var lawan = 2 if current_turn == "FS" else 1
 	
-	# Raycast Loop 40 langkah
+	# Raycast Loop 40 steps
 	for step in range(40):
 		current_x += dir_x
 		current_y += dir_y
 		
-		# Sensor Tepi & Gerbang LauZen
+		# LauZen Edge Sensor & Gateway
 		if current_x < 0 or current_x >= N or current_y < 0 or current_y >= N:
 			var in_x = current_x - dir_x
 			var in_y = current_y - dir_y
@@ -387,30 +395,30 @@ func _project_rtx_path(start_x: int, start_y: int, dir_x: int, dir_y: int) -> vo
 				dir_x = dir_y
 				dir_y = temp_dir
 			
-		# Absolute State (Memberhentikan Gerak, Penggambaran Visual)
+		# Absolute State (Stop Motion, Visual Depiction)
 		var isi_kotak = board_matrix[current_x][current_y]
 		
 		if isi_kotak == 0:
-			_draw_highlight(current_x, current_y, false) # Gambar jejak Hijau
+			_draw_highlight(current_x, current_y, false) # Green trail image
 		elif isi_kotak == lawan: 
-			_draw_highlight(current_x, current_y, true)  # BARU: Gambar MERAH tepat di kepala LAWAN asli!
-			return # Stop proyeksi karena nabrak mangsa
+			_draw_highlight(current_x, current_y, true)  # Red trail image
+			return # Stop projection due to hitting prey
 		elif isi_kotak == kawan: 
-			return # Stop proyeksi karena kehalang kawan sendiri
+			return # Stop projection because of being blocked by your own friends
 
 
 # ===========================================================
 # UMA MODULE 8: HDC (Harmony Domain Calculation) - AI Engine
 # ===========================================================
 
-# Fungsi aktif oleh saat pion hitam bergerak
+# Function is active when the black pawn moves
 func _wake_up_hdc() -> void:
 	if is_ai_thinking: return
 	is_ai_thinking = true
 	ai_status_label.visible = true
 	
 	# 1. Virtual Board Cloning (Deep Copy)
-	# Membuat papan tiruan agar AI tidak mengacaukan papan asli di layar
+	# Creates a clone board so the AI ​​doesn't mess up the original board on the screen.
 	var virtual_board = []
 	virtual_board.resize(N)
 	for x in range(N):
@@ -419,12 +427,12 @@ func _wake_up_hdc() -> void:
 		for y in range(N):
 			virtual_board[x][y] = board_matrix[x][y]
 	
-	# 2. SPersiapan Thread
+	# 2. Thread Preparation
 	if hdc_thread and hdc_thread.is_started():
 		hdc_thread.wait_to_finish() # Pastikan thread lama bersih
 		
 	hdc_thread = Thread.new()
-	# Jalankan fungsi berpikir di dimensi lain sambil membawa papan virtual dan kedalaman (depth)
+	# Run thinking functions in another dimension while bringing virtual boards and depth
 	hdc_thread.start(_hdc_thinker_thread.bind(virtual_board, active_ai_depth))
 
 # ---------------------------------------------------------
@@ -439,14 +447,14 @@ func _hdc_thinker_thread(v_board: Array, depth: int) -> Dictionary:
 		call_deferred("_on_hdc_finished", {})
 		return {}
 		
-	# --- SISTEM BOUNDED RATIONALITY (KALIBRASI DEPTH 2, 4, 6) ---
+	# --- Bounded Rationality System (KALIBRASI DEPTH 2, 4, 6) ---
 	var mistake_chance = 0.0
 	if depth <= 2:
 		mistake_chance = 0.35
 	elif depth <= 4:
 		mistake_chance = 0.15
 	else:
-		mistake_chance = 0.00 # Level 5 (Depth 6): AI Bertarung Mutlak
+		mistake_chance = 0.00 # Level 5 (Depth 6): Solid AI Fighting
 		
 	if randf() < mistake_chance:
 		best_move = legal_moves[randi() % legal_moves.size()]
@@ -473,7 +481,7 @@ func _hdc_thinker_thread(v_board: Array, depth: int) -> Dictionary:
 	call_deferred("_on_hdc_finished", best_move)
 	return best_move
 
-# Algoritma Brances Cutting (Minimax dengan Alpha-Beta Pruning)
+# Algoritma Brances Cutting (Minimax with Alpha-Beta Pruning)
 func _minimax(v_board: Array, depth: int, alpha: int, beta: int, is_maximizing: bool) -> int:
 	if depth == 0:
 		return _evaluate_board(v_board)
@@ -524,7 +532,7 @@ func _evaluate_board(v_board: Array) -> int:
 			
 			var piece_value = 0
 			var is_ai = (isi == 2)
-			var faksi_sign = 1 if is_ai else -1 # + untuk AI, - untuk Player
+			var faksi_sign = 1 if is_ai else -1 # + for AI, - for Player
 			
 			# 1. Core Value (Solid Health)
 			piece_value += 100 
@@ -534,24 +542,24 @@ func _evaluate_board(v_board: Array) -> int:
 			var is_border = (x == 0 or x == N - 1 or y == 0 or y == N - 1)
 			
 			if is_corner:
-				piece_value -= 10 # Pojokan = Area Buntu (Sangat Dihindari)
+				piece_value -= 10 # Corner = Dead End Area (Highly Avoidable)
 			elif is_border:
-				piece_value += 15 # Perimeter/TDP = Tempat RTX (Sangat Diprioritaskan)
+				piece_value += 15 # Perimeter/TDP = RTX Spot (Highly Prioritized)
 			else:
-				piece_value += 5  # Tengah = Aman, tapi tidak bisa menembak (Middle-State)
+				piece_value += 5  # Middle = Safe, but cannot shoot (Middle-State)
 				
-			# 3. Trajectory Threat Assesment (Sensor Jarak Jauh)
+			# 3. Trajectory Threat Assessment (Remote Sensor)
 			if is_border and not is_corner:
 				var dir = _get_outward_direction(x, y)
 				var threat_bonus = _calculate_threat_line(v_board, x, y, dir.x, dir.y, isi)
 				piece_value += threat_bonus
 				
-			# Akumulasi ke Global Score
+			# Accumulate to Global Score
 			score += piece_value * faksi_sign
 			
 	return score
 
-# Ghost Trail Sensor: Mengecek apakah garis RTX mengarah langsung ke musuh
+# Ghost Trail Sensor: Checks if the RTX line is pointing directly at the Enemy
 func _calculate_threat_line(v_board: Array, start_x: int, start_y: int, dir_x: int, dir_y: int, my_faksi: int) -> int:
 	var lawan = 1 if my_faksi == 2 else 2
 	var cx = start_x
@@ -585,7 +593,7 @@ func _calculate_threat_line(v_board: Array, start_x: int, start_y: int, dir_x: i
 		# Visual Absolute State (Rem)
 		var isi = v_board[cx][cy]
 		if isi == lawan:
-			threat_bonus = 20 # Pion mengunci target musuh (Dapat poin besar)
+			threat_bonus = 20 # Pion mengunci target Enemy (Dapat poin besar)
 			break
 		elif isi == my_faksi:
 			break # Terhalang kawan sendiri, garis ancaman batal
@@ -593,20 +601,20 @@ func _calculate_threat_line(v_board: Array, start_x: int, start_y: int, dir_x: i
 	return threat_bonus
 
 # =========================================================
-# AI Scan Machine (Hanya main data/non-visual)
+# AI Scan Machine (Only play data/non-visual)
 # =========================================================
 
-# Mengembalikan Array berisi Dictionary { "start": Vector2, "target": Vector2, "type": String }
+# Returns an Array containing Dictionary { "start": Vector2, "target": Vector2, "type": String }
 func _generate_all_legal_moves(v_board: Array, faksi: int) -> Array:
 	var moves = []
 	var arah_normal = [Vector2(0, -1), Vector2(0, 1), Vector2(-1, 0), Vector2(1, 0)]
 	
-	# Scan seluruh Path di papan dari ujung ke ujung
+	# Scan the entire Path on the board from end to end
 	for x in range(N):
 		for y in range(N):
-			if v_board[x][y] == faksi: # Jika ini Pion milik AI
+			if v_board[x][y] == faksi: # If this is AI's Pawn
 				
-				# 1. Cek Normal Move (Pindah 1 kotak ke area kosong)
+				# 1. Check Normal Move (Move 1 square to an empty area)
 				for arah in arah_normal:
 					var nx = x + int(arah.x)
 					var ny = y + int(arah.y)
@@ -614,10 +622,10 @@ func _generate_all_legal_moves(v_board: Array, faksi: int) -> Array:
 						if v_board[nx][ny] == 0:
 							moves.append({"start": Vector2(x, y), "target": Vector2(nx, ny), "type": "NORMAL"})
 							
-				# 2. Cek Garis RTX (Tembakan jarak jauh)
+					# 2. Check RTX Line (Long range shot)
 				if _is_valid_rtx_start(x, y):
 					var dir = _get_outward_direction(x, y)
-					# Menembak peluru (gaib), mengumpulkan semua data target yang bisa didarati/dimakan
+					# Shooting (invisible) bullets, collecting all target data that can be landed/eaten
 					var rtx_targets = _simulate_virtual_rtx(v_board, x, y, dir.x, dir.y, faksi)
 					
 					for target in rtx_targets:
@@ -625,7 +633,7 @@ func _generate_all_legal_moves(v_board: Array, faksi: int) -> Array:
 						
 	return moves
 
-# Simulasi Fisika RTX (Ghost Trail, Persis seperti aslinya, tapi tanpa efek suara/visual)
+# RTX Physics Simulation (Ghost Trail, Exactly like the real thing, but without sound/visual effects)
 func _simulate_virtual_rtx(v_board: Array, start_x: int, start_y: int, dir_x: int, dir_y: int, faksi: int) -> Array:
 	var valid_targets = []
 	var lawan = 1 if faksi == 2 else 2
@@ -661,16 +669,16 @@ func _simulate_virtual_rtx(v_board: Array, start_x: int, start_y: int, dir_x: in
 		var isi = v_board[cx][cy]
 		
 		if isi == 0:
-			valid_targets.append(Vector2(cx, cy)) # Jalan kosong, sah untuk dilewati/didarati
+			valid_targets.append(Vector2(cx, cy)) # Empty road, legal to pass/land on
 		elif isi == lawan:
-			valid_targets.append(Vector2(cx, cy)) # Nabrak musuh, sah untuk dimakan
+			valid_targets.append(Vector2(cx, cy)) 
 			break # Peluru berhenti di sini
 		elif isi == faksi:
-			break # Terhalang teman sendiri, peluru berhenti
+			break # Blocked by your own friends, the bullets stop
 			
 	return valid_targets
 ## =========================================================
-# Fase Eksekusi: Membawa Keputusan AI Ke Layar Utama
+# Execution Phase: Bringing AI Decisions to the Home Screen
 # =========================================================
 func _on_hdc_finished(best_move: Dictionary) -> void:
 	if hdc_thread.is_started():
@@ -682,61 +690,102 @@ func _on_hdc_finished(best_move: Dictionary) -> void:
 		_switch_turn()
 		return
 	
-	# AI Taken Detection: Mengecek apakah Target Path diisi Player sebelum diTIMPA
+	# AI Taken Detection: Checks if the Target Path is occupied by a Player before being di TIMPA
 	if board_matrix[best_move.target.x][best_move.target.y] == 1:
 		AudioManager.get_node("PiecesEatenSFX").play()
 	
-	# 1. Mengubah Realita di Real Matrix Memory (On the Screen)
+	# 1. Changing Reality in Real Matrix Memory (On the Screen)
 	board_matrix[best_move.target.x][best_move.target.y] = 2 
 	board_matrix[best_move.start.x][best_move.start.y] = 0
 	
-	# 2. Memutar SFX Gerak (akan stacking dengan suara taken dan memperbarui data visual
+	# 2. Playing Motion SFX (will stack with sound taken and update visual data)
 	AudioManager.get_node("PiecesMoveSFX").play()
 	_spawn_universal_pieces()
 	
-	# 3. Mengembalikan giliran ke White-turn
+	# 3. Returning the turn to White-turn
 	_switch_turn()
 
 # =========================================================
 # UI & Scene Navigation (Game Over)
 # =========================================================
-func _show_game_over_screen(is_win: bool) -> void:
+func _show_game_over_screen(is_win: bool, is_give_up: bool = false) -> void:
 	game_over_screen.visible = true
+	var title_node = $CanvasLayer/GameOverScreen/GameOver_Panel/VBoxContainer/GameOverTitle
 	
+	# --- Absolute Separation of Board Match Lanes (PVP) ---
+	if game_mode == "pvp":
+		level_description.visible = false # Hide progress level info chain
+		title_node.add_theme_color_override("font_color", Color.GOLD)
+		AudioManager.get_node("PiecesEatenSFX").play()
+		
+		var sisa_putih = 0
+		var sisa_hitam = 0
+		for tx in range(N):
+			for ty in range(N):
+				if board_matrix[tx][ty] == 1: sisa_putih += 1
+				elif board_matrix[tx][ty] == 2: sisa_hitam += 1
+				
+		if is_give_up:
+			status_label.text = "Match Abandoned. Restart?"
+		elif sisa_hitam == 0:
+			status_label.text = "Player 1 (White) Wins!"
+		elif sisa_putih == 0:
+			status_label.text = "Player 2 (Black) Wins!"
+		return # Instant Exit: All Singleplayer save codes below are purely bypassed
+	# -------------------------------------------------
 	if is_win:
 		status_label.text = "You Win, Next Level?"
-		AudioManager.get_node("PiecesEatenSFX").play() # Bisa diganti SFX Menang kalau ada
+		title_node.add_theme_color_override("font_color", Color.GREEN) 
+		AudioManager.get_node("PiecesEatenSFX").play()
 		
 		# --- Save Progress System ---
 		var config = ConfigFile.new()
+		var target_progress = 1
+		
 		if config.load("res://settings.cfg") == OK:
-			# Membaca Level terdahulu, default 1 jika belum ada
 			var current_progress = config.get_value("GAME_SESSION", "progress", 1) 
-			
-			# Add 1 Level (Next Level)
-			config.set_value("GAME_SESSION", "progress", current_progress + 1)
+			target_progress = current_progress + 1
+			config.set_value("GAME_SESSION", "progress", target_progress)
+			config.save("res://settings.cfg")
+		else:
+			target_progress = 2
+			config.set_value("GAME_SESSION", "progress", target_progress)
 			config.save("res://settings.cfg")
 			
+		# --- Progress Number Chain Generator ---
+		var level_chain = ""
+		for i in range(1, target_progress + 1):
+			level_chain += str(i)
+			if i < target_progress:
+				level_chain += ", "
+				
+		level_description.text = "You Unlocked Level: " + level_chain
+		level_description.visible = true
+		
 	else:
-		status_label.text = "You Lose, Try Again?"
+		# --- Lose Condition Branches ---
+		if is_give_up:
+			status_label.text = "You Give Up, Restart?"
+		else:
+			status_label.text = "You Lose, Try Again?"
+			
+		title_node.add_theme_color_override("font_color", Color.RED) 
 		AudioManager.get_node("InvalidSFX").play()
+		level_description.visible = false
 
-# Fungsi klik tombol Home
+# Home button click function
 func _on_home_pressed() -> void:
 	AudioManager.get_node("ClickSFX").play()
 	# Ganti sesuai path Main Menu milikmu
 	game_over_screen.visible = false
 	TransitionScreen.pindah_scene("res://scenes/MainMenu.tscn") 
 
-# Fungsi klik tombol Repeat
+# Repeat button click function
 func _on_repeat_pressed() -> void:
 	AudioManager.get_node("ClickSFX").play()
-	# Reload scene ini dengan konfigurasi map & depth yang sama
 	game_over_screen.visible = false
 	TransitionScreen.pindah_scene("res://scenes/MainGame.tscn")
 
-# Fungsi klik tombol Home2 (Dalam Permainan Langsung
-func _on_home2_pressed() -> void:
+func _on_give_up_pressed() -> void:
 	AudioManager.get_node("ClickSFX").play()
-	game_over_screen.visible = false
-	TransitionScreen.pindah_scene("res://scenes/MainMenu.tscn") 
+	_show_game_over_screen(false, true)
