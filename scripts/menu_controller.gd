@@ -42,9 +42,8 @@ func _first_time():
 	display_resolution = DisplayServer.screen_get_size()
 	# Web Detection
 	if OS.has_feature("web"):
-		window_mode = 0 # Biarkan mode Windowed menyesuaikan kanvas Itch.io
-	else:
-		window_mode = 1 # Fullscreen aman untuk file .exe PC
+		window_mode = 0
+		window_mode = 1
 	vsync = 1 
 	msaa_preset = 1 
 	%WindowMode_Optionbutton.select(window_mode)
