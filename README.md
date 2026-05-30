@@ -25,7 +25,6 @@ Handles scene routing, configuration parsing, and system gates.
 The following modules represent the current technical debt and areas requiring development:
 
 - [ ] **Netcode Implementation:** The "Online Match" feature is currently disabled. Requires peer-to-peer or dedicated server networking logic for remote multiplayer.
-- [ ] **Local Multiplayer:** "Board Match" (Hotseat mode) is unbuilt. Requires bypassing the AI thread and assigning inputs to alternate players.
 - [ ] **VFX Overhaul:** The RTX trajectory currently uses static sprite overlays (`Show Path` / `Eat Path`). Replace these with dynamic 2D shaders, raycast visualization, or particle systems.
 - [ ] **Iterative Deepening:** The AI currently computes to a fixed maximum depth (Depth 6). Implement iterative deepening with a time limit to prevent excessive calculation times on lower-end hardware.
 - [ ] **Audio State Machine:** Implement dynamic BGM transitions based on the board's tension state (e.g., when player or AI pieces fall below a certain threshold).
